@@ -1,0 +1,305 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;
+  IGNORE_CASE = true;}PARSER_BEGIN(Analisador) 
+
+public class Analisador {
+
+    public void processa() throws Exception {
+        while (true) {
+            Token t = getNextToken();
+            String nomeToken = tokenImage[t.kind];
+            System.out.println(nomeToken);
+            if (t.kind == ponto_virg)
+                break;
+        }
+    }
+
+   public static void main(String[] args) {
+            System.out.print("Digite:");
+            Analisador analisador = new Analisador(System.in);
+            try {
+                  analisador.processa();
+            }
+            catch (Exception e) {
+                  System.out.println(e.getMessage());
+                  e.printStackTrace();
+            }
+      }
+}
+
+PARSER_END(Analisador) SKIP :{	"\r" |
+		"\t" |
+		"\n"}TOKEN:{
+  <PALAVRAS_RESERVADAS: "div" 		|
+  						"or" 		|
+  						"and" 		|
+  						"not" 		|
+  						"if" 		|
+  						"then" 		|
+  						"else" 		|
+  						"of" 		|
+  						"while" 	|
+  						"do"		|
+  						"begin" 	|
+  						"end" 		|
+  						"read" 		|
+  						"write" 	|
+  						"var" 		|
+  						"array"     |
+  						"function"  |
+  						"procedure" |
+  						"program"   |
+  						"true"      |
+  						"false"> {System.out.println("PALAVRAS_RESERVADAS -> "+image);}
+    					  
+| <COMANDOS: "write"|
+			 "read">{System.out.println("COMANDO -> "+image);}
+}
+
+TOKEN:{
+	  <TIPOS_DE_DADOS: "char"    |
+	  		  		   "integer" |
+	  		           "boolean"> {System.out.println("TIPOS_DE_DADOS -> "+image);}
+	| <NUMEROS : (["0"-"9"])+ > {System.out.print("NUMEROS "+image+"\r\n");}
+	| <IDENTIFICADORES : ["a"-"z","A"-"Z"]>{System.out.print("IDENTIFICADORES -> "+image+"\r\n");}
+}
+
+TOKEN : { 
+	  <OPERADORES: "+"|"-"|"*"|"/"|"=">{System.out.println("OPERADOR -> "+image);}
+	| <COMPARADORES: "<>"|"<"|">"|"<="|">="|":=" >{System.out.println("COMPARADOR -> "+image);}
+}
+
+TOKEN:{
+	<PROGRAMA: "Program " > {System.out.println("PROGRAMA -> "+image);}
+}
+
+TOKEN:{
+      <ABRE_PARENTESE: "(" >{System.out.println("ABRE_PARENTESE -> "+image);}
+	| <FECHA_PARENTESE: ")" >{System.out.println("FECHA_PARENTESE -> "+image);}
+	| <ABRE_CHAVE: "{" >{System.out.println("ABRE_CHAVES -> "+image);}
+	| <FECHA_CHAVE: "}" >{System.out.println("FECHA_CHAVE -> "+image);}
+	| <ABRE_COLCHETE: "[" >{System.out.println("ABRE_COLCHETE -> "+image);}
+	| <FECHA_COLCHETE: "]" >{System.out.println("FECHA_COLCHETE -> "+image);}
+	| <TERMINAIS: ";"|":"|"."|"," >{System.out.println("TERMINAIS -> "+image);}
+}
+
+TOKEN: {
+	< VAZIO: " " >{System.out.println("VAZIO -> "+image);}
+}
+
+void program():
+{}
+{
+	< PROGRAMA >< IDENTIFICADORES >< TERMINAIS >block()
+}
+
+void block() :
+{}
+{
+	variableDeclarationPart()statementPart()
+}
+
+void variableDeclarationPart() :
+{}
+{
+	< VAZIO > | < PALAVRAS_RESERVADAS >variableDeclaration()< TERMINAIS >< ABRE_CHAVE >variableDeclaration()< TERMINAIS >< FECHA_CHAVE >
+}
+
+void variableDeclaration() :
+{}
+{
+	< IDENTIFICADORES >< ABRE_CHAVE >< TERMINAIS >< IDENTIFICADORES ><FECHA_CHAVE>< TERMINAIS >type()
+}
+
+void type() :
+{}
+{
+	simpleType() | arrayType()
+}
+
+void arrayType() :
+{}
+{
+	< PALAVRAS_RESERVADAS >< ABRE_COLCHETE >indexRange()< FECHA_COLCHETE >< PALAVRAS_RESERVADAS >simpleType()
+}
+
+void indexRange() :
+{}
+{
+	<NUMEROS>
+}
+
+void simpleType() :
+{}
+{
+	<TIPOS_DE_DADOS>
+}
+
+void typeIdentifier() :
+{}
+{
+	<IDENTIFICADORES>
+}
+
+void statementPart() :
+{}
+{
+	compoundStatement()
+}
+
+void compoundStatement() :
+{}
+{
+	< PALAVRAS_RESERVADAS >statement()< ABRE_CHAVE >< TERMINAIS >statement()<FECHA_CHAVE>< PALAVRAS_RESERVADAS>
+}
+
+void statement() :
+{}
+{
+	simpleStatement() | structuredStatement()
+}
+
+void simpleStatement() :
+{}
+{
+	assignment() | readStatement()
+}
+
+void structuredStatement() :
+{}
+{
+	compoundStatement()
+}
+
+void ifStatement() :
+{}
+{
+	< PALAVRAS_RESERVADAS >expression()< PALAVRAS_RESERVADAS >statement()
+}
+
+void whileStatement() :
+{}
+{
+	< PALAVRAS_RESERVADAS >expression()< PALAVRAS_RESERVADAS >statement()
+}
+
+void readStatement() :
+{}
+{
+	< COMANDOS >< ABRE_PARENTESE >variable()< ABRE_CHAVE >< TERMINAIS >variable()<FECHA_CHAVE><FECHA_PARENTESE>
+}
+
+void writeStatement() :
+{}
+{
+	< COMANDOS >< ABRE_PARENTESE >variable()< ABRE_CHAVE >< TERMINAIS >variable()<FECHA_CHAVE><FECHA_PARENTESE>
+}
+
+void assignment() :
+{}
+{
+	variable()< COMPARADORES >expression()
+}
+
+void variable() :
+{}
+{
+	entireVariable()
+}
+
+void entireVariable() :
+{}
+{
+	variableIdentifier()
+}
+
+void variableIdentifier() :
+{}
+{
+	<IDENTIFICADORES>
+}
+
+void indexedVariable() :
+{}
+{
+	arrayVariable()< ABRE_COLCHETE >expression()<FECHA_COLCHETE>
+}
+
+void arrayVariable() :
+{}
+{
+	entireVariable()
+}
+
+void expression() :
+{}
+{
+	simpleExpression()
+}
+
+void relationalOperator() :
+{}
+{
+	< OPERADORES > | < COMPARADORES > | < PALAVRAS_RESERVADAS >
+}
+
+void simpleExpression() :
+{}
+{
+	sing()term()< ABRE_CHAVE >addingOperator()term()< FECHA_CHAVE >
+}
+
+void sing() :
+{}
+{
+	< OPERADORES > | < VAZIO >
+}
+
+void addingOperator() :
+{}
+{
+	< OPERADORES >
+}
+
+void term() :
+{}
+{
+	factor()< ABRE_CHAVE >multiplyingOperator()factor()< FECHA_CHAVE >
+}
+
+void factor() :
+{}
+{
+	variable()
+}
+
+void multiplyingOperator() :
+{}
+{
+	< OPERADORES > | < PALAVRAS_RESERVADAS >
+}
+
+void constant() :
+{}
+{
+	integerConstante()
+}
+
+void integerConstante() :
+{}
+{
+	< NUMEROS >
+}
+
+void characterConstant() :
+{}
+{
+	lettetOrDigit()
+}
+
+void lettetOrDigit() :
+{}
+{
+	< IDENTIFICADORES > | < NUMEROS >
+}
